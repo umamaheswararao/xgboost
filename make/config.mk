@@ -22,10 +22,10 @@
 # export MPICXX = mpicxx
 
 # the additional link flags you want to add
-ADD_LDFLAGS =
+ADD_LDFLAGS =-L/home/xgboost/install/OneCCL/oneccl/build/_install/lib
 
 # the additional compile flags you want to add
-ADD_CFLAGS =
+ADD_CFLAGS =-I/home/xgboost/install/OneCCL/oneccl/build/_install/include
 
 # Whether enable openmp support, needed for multi-threading.
 USE_OPENMP = 1
@@ -52,7 +52,7 @@ endif
 # Rabit library version,
 # - librabit.a Normal distributed version.
 # - librabit_empty.a Non distributed mock version,
-LIB_RABIT = librabit.a
+LIB_RABIT = librabit_empty.a
 
 # path to libjvm.so
 LIBJVM=$(JAVA_HOME)/jre/lib/amd64/server

@@ -20,6 +20,7 @@ import java.io.File
 import java.nio.file.Files
 
 import scala.collection.{AbstractIterator, mutable}
+import scala.util.Properties
 import scala.util.Random
 import scala.collection.JavaConverters._
 
@@ -389,8 +390,8 @@ object XGBoost extends Serializable {
       case "python" => new PyRabitTracker(nWorkers)
       case _ => new PyRabitTracker(nWorkers)
     }
-
-    require(tracker.start(trackerConf.workerConnectionTimeout), "FAULT: Failed to start tracker")
+    System.getenv.forEach((name, value) => println(s"$name: $value"))
+    // require(tracker.start(trackerConf.workerConnectionTimeout), "FAULT: Failed to start tracker")
     tracker
   }
 
@@ -446,8 +447,13 @@ object XGBoost extends Serializable {
       rabitEnv: java.util.Map[String, String],
       prevBooster: Booster,
       evalSetsMap: Map[String, RDD[XGBLabeledPoint]]): RDD[(Booster, Map[String, Array[Float]])] = {
-    if (evalSetsMap.isEmpty) {
+   var pmType = sys.env("CCL_PM_TYPE")
+   println("UMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa:::" + pmType)
+   if (evalSetsMap.isEmpty) {
       trainingData.mapPartitions(labeledPoints => {
+        println("mapPartitions:  UMAAAAAAAAAAAAAAAAAAAAAa::type:" + sys.env("CCL_PM_TYPE"))
+        println("mapPartitions:  UMAAAAAAAAAAAAAAA::worldsize:" + sys.env("CCL_WORLD_SIZE"))
+        System.getenv.forEach((name, value) => println(s"$name: $value"))
         val watches = Watches.buildWatches(xgbExecutionParams,
           processMissingValues(labeledPoints, xgbExecutionParams.missing,
             xgbExecutionParams.allowNonZeroForMissing),
@@ -547,6 +553,7 @@ object XGBoost extends Serializable {
     try {
       // Train for every ${savingRound} rounds and save the partially completed booster
       val tracker = startTracker(xgbExecParams.numWorkers, xgbExecParams.trackerConf)
+      println("Tracker start called....")
       val (booster, metrics) = try {
         val parallelismTracker = new SparkParallelismTracker(sc,
           xgbExecParams.timeoutRequestWorkers,
@@ -559,6 +566,7 @@ object XGBoost extends Serializable {
           trainForNonRanking(transformedTrainingData.right.get, xgbExecParams, rabitEnv,
             prevBooster, evalSetsMap)
         }
+        println("Train for non ranking done.........................")
         val sparkJobThread = new Thread() {
           override def run() {
             // force the job
@@ -566,7 +574,7 @@ object XGBoost extends Serializable {
           }
         }
         sparkJobThread.setUncaughtExceptionHandler(tracker)
-        sparkJobThread.start()
+        // sparkJobThread.start()
         val trackerReturnVal = parallelismTracker.execute(tracker.waitFor(0L))
         logger.info(s"Rabit returns with exit code $trackerReturnVal")
         val (booster, metrics) = postTrackerReturnProcessing(trackerReturnVal,

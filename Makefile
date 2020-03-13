@@ -62,9 +62,9 @@ export CXX = g++
 endif
 endif
 
-export LDFLAGS= -pthread -lm $(ADD_LDFLAGS) $(DMLC_LDFLAGS)
-export CFLAGS= -DDMLC_LOG_CUSTOMIZE=1 -std=c++11 -Wall -Wno-unknown-pragmas -Iinclude $(ADD_CFLAGS)
-CFLAGS += -I$(DMLC_CORE)/include -I$(RABIT)/include -I$(GTEST_PATH)/include
+export LDFLAGS= -pthread -lm $(ADD_LDFLAGS) $(DMLC_LDFLAGS) -L/home/xgboost/install/OneCCL/oneccl/build/_install/lib
+export CFLAGS= -g -DDMLC_LOG_CUSTOMIZE=1 -std=c++11 -Wall -Wno-unknown-pragmas -Iinclude $(ADD_CFLAGS) -ldl
+CFLAGS += -I$(DMLC_CORE)/include -I$(RABIT)/include -I$(GTEST_PATH)/include -I/home/xgboost/install/OneCCL/oneccl/build/_install/include
 #java include path
 export JAVAINCFLAGS = -I${JAVA_HOME}/include -I./java
 
@@ -127,7 +127,7 @@ jvm: jvm-packages/lib/libxgboost4j.so
 SRC = $(wildcard src/*.cc src/*/*.cc)
 ALL_OBJ = $(patsubst src/%.cc, build/%.o, $(SRC))
 AMALGA_OBJ = amalgamation/xgboost-all0.o
-LIB_DEP = $(DMLC_CORE)/libdmlc.a $(RABIT)/lib/$(LIB_RABIT)
+LIB_DEP = $(DMLC_CORE)/libdmlc.a $(RABIT)/lib/$(LIB_RABIT) /home/xgboost/install/OneCCL/oneccl/build/_install/lib/libccl.a
 ALL_DEP = $(filter-out build/cli_main.o, $(ALL_OBJ)) $(LIB_DEP)
 CLI_OBJ = build/cli_main.o
 include tests/cpp/xgboost_test.mk

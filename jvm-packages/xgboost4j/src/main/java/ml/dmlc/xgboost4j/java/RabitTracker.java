@@ -129,17 +129,7 @@ public class RabitTracker implements IRabitTracker {
   }
 
   private boolean startTrackerProcess() {
-    try {
-      String trackerExecString = this.addTrackerProperties("python " + tracker_py +
-          " --log-level=DEBUG --num-workers=" + String.valueOf(numWorkers));
-
-      trackerProcess.set(Runtime.getRuntime().exec(trackerExecString));
-      loadEnvs(trackerProcess.get().getInputStream());
-      return true;
-    } catch (IOException ioe) {
-      ioe.printStackTrace();
-      return false;
-    }
+    return true;
   }
 
   private String addTrackerProperties(String trackerExecString) {
@@ -189,18 +179,7 @@ public class RabitTracker implements IRabitTracker {
               "shutdown signal, or manual interruptions. " +
               "Use the Scala RabitTracker for timeout support.");
     }
+    return 0;
 
-    try {
-      trackerProcess.get().waitFor();
-      int returnVal = trackerProcess.get().exitValue();
-      logger.info("Tracker Process ends with exit code " + returnVal);
-      stop();
-      return returnVal;
-    } catch (InterruptedException e) {
-      // we should not get here as RabitTracker is accessed in the main thread
-      e.printStackTrace();
-      logger.error("the RabitTracker thread is terminated unexpectedly");
-      return TrackerStatus.INTERRUPTED.getStatusCode();
-    }
   }
 }

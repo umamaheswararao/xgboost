@@ -87,6 +87,7 @@ public class Booster implements Serializable, KryoSerializable {
     }
     in.close();
     Booster ret = new Booster(new HashMap<String, Object>(), new DMatrix[0]);
+    new IOException("NOException Info: Ignore").printStackTrace();
     XGBoostJNI.checkCall(XGBoostJNI.XGBoosterLoadModelFromBuffer(ret.handle,os.toByteArray()));
     return ret;
   }
@@ -718,6 +719,7 @@ public class Booster implements Serializable, KryoSerializable {
       this.init(null);
       this.version = in.readInt();
       byte[] bytes = (byte[])in.readObject();
+      new IOException("NOException Info: Ignore").printStackTrace();
       XGBoostJNI.checkCall(XGBoostJNI.XGBoosterLoadModelFromBuffer(this.handle, bytes));
     } catch (XGBoostError ex) {
       ex.printStackTrace();
@@ -759,6 +761,7 @@ public class Booster implements Serializable, KryoSerializable {
       this.version = input.readInt();
       byte[] bytes = new byte[serObjSize];
       input.readBytes(bytes);
+      new IOException("NOException Info: Ignore").printStackTrace();
       XGBoostJNI.checkCall(XGBoostJNI.XGBoosterLoadModelFromBuffer(this.handle, bytes));
     } catch (XGBoostError ex) {
       logger.error(ex.getMessage(), ex);
